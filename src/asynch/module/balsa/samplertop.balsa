@@ -1,0 +1,55 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+import [sampler]
+
+procedure samplertop (
+  -- Input(s)
+  sync ctrltop_samplertop;
+  input sense_in : bit;
+  array 2 of sync reg_r;   
+  array 2 of input reg_data_out : regdata;
+  -- Output(s)
+  output sensedrive_out : sensedrive_bd;
+  output samplertop_medtop : regdata
+) is
+    -- Channel(s)
+    channel samplertop_sampler : samplertop_sampler_bd
+    channel sampler_samplertop : regdata
+    -- Variable(s)
+    variable numsamples : regdata
+    variable subvalue : regdata
+begin
+    sampler(
+      samplertop_sampler,
+      sense_in,
+      sensedrive_out,
+      sampler_samplertop
+    )
+ ||
+    loop
+        [
+          -- Wait for ctrltop_samplertop
+          select ctrltop_samplertop then continue end
+        ;
+          -- Read numsamplesreg 
+          [sync reg_r[0] || reg_data_out[0] -> numsamples]
+        ;
+          -- Read subvaluereg 
+          [sync reg_r[1]|| reg_data_out[1] -> subvalue]
+        ;
+          [          
+            -- Start sampler and wait for sampler data
+            samplertop_sampler <- {
+              numsamples,
+              subvalue
+            }
+         ||
+            select sampler_samplertop then
+                -- Send data to medtop
+                samplertop_medtop <- sampler_samplertop
+            end -- select sampler_samplertop
+          ]
+        ]
+    end -- loop
+end -- procedure samplertop

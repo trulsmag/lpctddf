@@ -1,0 +1,56 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+import [thcomp]
+
+procedure thcomptop (
+  -- Input(s)
+  input ematop_thcomptop : regdata; 
+  array 2 of input reg_data_out : regdata;
+  -- Output(s)
+  array 2 of sync reg_r; 
+  output reg_data_in : regdata;
+  output thcomptop_ctrltop : bit
+) is
+    -- Channel(s)
+    channel thcomptop_thcomp : thcomptop_thcomp_bd
+    channel thcomp_thcomptop : bit
+    -- Variable(s)
+    variable value : regdata
+    variable threshold : regdata
+begin
+    thcomp(
+      thcomptop_thcomp, 
+      thcomp_thcomptop
+    )
+ ||
+    loop
+        [        
+          -- Wait for ematop_thcomptop
+          select ematop_thcomptop then
+              -- Write ematop data to reg
+              reg_data_in <- ematop_thcomptop
+          end -- select ematop_thcomptop
+        ;
+          -- Read thcompreg
+          [reg_data_out[0] -> value || sync reg_r[0]]
+        ;
+          -- Read thresholdreg
+          [reg_data_out[1] -> threshold || sync reg_r[1]]
+        ;
+          [
+            -- Start thcomp and wait for thcomp data
+            thcomptop_thcomp <- {
+              value,
+              threshold            
+            }
+         ||
+            select thcomp_thcomptop then
+                -- Send data to ctrltop
+                thcomptop_ctrltop <- thcomp_thcomptop
+            end -- select thcomp_thcomptop
+          ]
+        ]
+    end -- loop
+end -- procedure thcomptop
+

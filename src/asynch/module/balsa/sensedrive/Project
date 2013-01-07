@@ -1,0 +1,23 @@
+;;; Balsa Project file
+;;; Created: Fri May 18 14:56:00 2012
+;;; By: tg@slmpEee (Linux)
+;;; With balsa-mgr version: 4.0 (2010-06-09)
+;;; Supplied with Balsa version: 4.0
+
+(balsa-project
+    (name "sensedrive")
+    (import-path ".")
+    (simulation-system "breezesim")
+    (defines
+        (define "BALSACOPTS" "-c allow-sequential-selection")
+    )
+    (files
+        "params"
+        (top-level "sampler"
+            (implementation "sampler"
+                (balsa-netlist-options "--simulation-initialise")
+                (technology "NDC35900L/four_b_rb/")
+            )
+        )
+    )
+)

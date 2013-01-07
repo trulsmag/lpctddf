@@ -1,0 +1,26 @@
+;;; Balsa Project file
+;;; Created: Wed May  2 15:18:52 2012
+;;; By: tg@slmpEee (Linux)
+;;; With balsa-mgr version: 4.0 (2010-06-09)
+;;; Supplied with Balsa version: 4.0
+
+(balsa-project
+    (name "thcomp_tb")
+    (import-path ".." ".")
+    (simulation-system "breezesim")
+    (files
+        "inputGen"
+        "inputGenTop"
+        "outputComp"
+        "thcomp"
+        (top-level "thcomp_tb"
+            (test "thcomp_tb" "thcomp_tb"
+                (ports
+                    (input-port "filename_i0" value "_input.dat")
+                    (input-port "filename_i1" value "_output.dat")
+                    (input-port "filename_o" value "_monitor.dat")
+                )
+            )
+        )
+    )
+)

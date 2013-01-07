@@ -1,0 +1,55 @@
+;;; Breeze intermediate file (list format)
+;;; Created: Fri May 18 14:06:48 2012
+;;; By: tg@slmpEee (Linux)
+;;; With balsa-c version: 4.0
+;;; Command: balsa-c -b -I . sense 
+
+;;; Imports
+(import "balsa.types.builtin")
+(import "balsa.types.synthesis")
+(import "balsa.types.basic")
+;;; Types
+
+;;; Constants
+
+;;; Parts
+(breeze-part "sense"
+  (ports
+    (sync-port "activate" passive (at 4 1 "sense.balsa" 0))
+    (port "push" active output (numeric-type #f 1) (at 6 15 "sense.balsa" 0))
+  )
+  (attributes
+    (is-procedure)
+    (is-permanent)
+    (at 4 1 "sense.balsa" 0)
+  )
+  (channels
+    (sync (at 12 5 "sense.balsa" 1)) ; 1
+    (push 1 (at 18 11 "sense.balsa" 1) (name "push")) ; 2
+    (pull 1 (at 18 19 "sense.balsa" 1) (name "sense_in_d")) ; 3
+    (sync (at 18 16 "sense.balsa" 1)) ; 4
+    (pull 1 (at 16 25 "sense.balsa" 1) (name "sense_in_d_m")) ; 5
+    (push 1 (at 16 22 "sense.balsa" 1) (name "sense_in_d")) ; 6
+    (sync (at 16 22 "sense.balsa" 1)) ; 7
+    (pull 1 (at 14 27 "sense.balsa" 1)) ; 8
+    (push 1 (at 14 24 "sense.balsa" 1) (name "sense_in_d_m")) ; 9
+    (sync (at 14 24 "sense.balsa" 1)) ; 10
+    (sync (at 15 9 "sense.balsa" 1)) ; 11
+  )
+  (components
+    (component "$BrzVariable" (1 1 "sense_in_d[0..0]" "") (6 (3)) (at 9 5 "sense.balsa" 0)) ; 0
+    (component "$BrzVariable" (1 1 "sense_in_d_m[0..0]" "") (9 (5)) (at 10 5 "sense.balsa" 0)) ; 1
+    (component "$BrzLoop" () (1 11) (at 12 5 "sense.balsa" 0)) ; 2
+    (component "$BrzSequence" (3 "TT") (11 (10 7 4)) (at 15 9 "sense.balsa" 0)) ; 3
+    (component "$BrzFetch" (1 "false") (10 8 9) (at 14 24 "sense.balsa" 0)) ; 4
+    (component "$BrzConstant" (1 1) (8) (at 14 27 "sense.balsa" 0)) ; 5
+    (component "$BrzFetch" (1 "false") (7 5 6) (at 16 22 "sense.balsa" 0)) ; 6
+    (component "$BrzFetch" (1 "false") (4 3 2) (at 18 16 "sense.balsa" 0)) ; 7
+  )
+  (call-contexts
+    (call-context 1 "sense" (at 4 1 "sense.balsa" 0) (at 0 0 "" 0) 0)
+  )
+)
+
+
+;;; EOF

@@ -1,0 +1,40 @@
+;;; Balsa Project file
+;;; Created: Mon May  7 11:07:32 2012
+;;; By: tg@slmpEee (Linux)
+;;; With balsa-mgr version: 4.0 (2010-06-09)
+;;; Supplied with Balsa version: 4.0
+
+(balsa-project
+    (name "top")
+    (import-path ".")
+    (simulation-system "breezesim")
+    (defines
+        (define "BALSACOPTS" "-c allow-sequential-selection")
+    )
+    (files
+        "ctrltop"
+        "ema"
+        "ematop"
+        "med"
+        "medtop"
+        "mult_shiftadd"
+        "params"
+        "reg1cfgw2r"
+        "reg1regw2r"
+        "regs"
+        "sampler"
+        "samplertop"
+        "thcomp"
+        "thcomptop"
+        (top-level "top"
+            (implementation "impl4phbd"
+                (balsa-netlist-options "--simulation-initialise")
+                (technology "NDC35900L/four_b_rb/")
+            )
+            (implementation "impldr"
+                (balsa-netlist-options "--simulation-initialise")
+                (technology "NDC35900L/dual_b/")
+            )
+        )
+    )
+)

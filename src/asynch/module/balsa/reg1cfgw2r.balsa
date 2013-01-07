@@ -1,0 +1,37 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+
+procedure reg1cfgw2r (
+  -- Input(s)
+  sync reg_r;
+  sync cfg_r;
+  input cfg_data_in : regdata;
+  -- Output(s)
+  output reg_data_out : regdata;
+  output cfg_data_out : regdata
+) is
+    -- Variable(s)
+    variable reg : regdata
+    -- Channel(s)
+    channel ch_r : bit
+begin
+       loop     
+       arbitrate 
+            ch_r then 
+                case ch_r of 
+                      0 then reg_data_out <- reg |
+                      1 then cfg_data_out <- reg
+                end 
+        |
+            cfg_data_in then
+                  reg := cfg_data_in
+            end 
+       end
+     ||
+        loop
+        arbitrate reg_r then ch_r <- 0
+        |         cfg_r then ch_r <- 1
+        end
+    end
+end 

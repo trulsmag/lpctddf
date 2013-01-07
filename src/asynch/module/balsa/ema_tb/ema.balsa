@@ -1,0 +1,73 @@
+-- Import libraries
+import [balsa.types.basic]
+import [balsa.sim.string]
+import [mult_shiftadd]
+
+
+procedure ema (
+  -- Input (s)  
+  input ematop_ema : array 3 of regdata;
+  -- Output (s)
+  output ema_ematop : regdata
+) is
+    -- Variable(s)
+    variable r0 : TNS
+    variable r1 : TNS
+    variable res_tmp : TNS
+    -- Channel(s)
+    channel ch_xy : EMA_MULT_BD 
+    channel ch_product : TNS
+    -- Shared procedure(s)
+begin
+    mult_shiftadd(
+      ch_xy,
+      ch_product
+    )
+ ||
+    loop
+        select ematop_ema then  
+            [
+            print "S      = ", NumberToString (TNS, (ematop_ema[0] as TNS), 2, 4, 1)
+            ;
+              r0 := (ematop_ema[0] as TNS) -- (med_i)
+            ;
+            print "E      = ", NumberToString (TNS, (ematop_ema[1] as TNS), 2, 4, 1)
+            ;
+              r1 := (-(ematop_ema[1] as TN1) as TNS)
+            ;
+              res_tmp := (r0 + r1 as TNS) -- (med_i)+(-ema_i-1)
+            ;
+            print "S+(-E)= ", NumberToString (TNS, (res_tmp as TNS), 2, 4, 1)
+            ;
+            print "A     = ", NumberToString (TNS, (ematop_ema[2] as TNS), 2, 4, 1)
+            ;
+              [
+                ch_xy <- {
+                  (ematop_ema[2] as TN) , -- (alpha)
+                  (res_tmp as TNS)
+                }
+             ||
+                select ch_product then
+                    r1 := (ch_product as TNS)
+                end -- select ch_product
+              ]
+            ;              
+            print "r[1]   = ", NumberToString (TNS, (r1 as TNS), 2, 4, 1)
+            ;
+              r0 := (ematop_ema[1] as TNS)
+            ;
+            print "r[0]   = ", NumberToString (TNS, (r0 as TNS), 2, 4, 1)
+            ;
+            print "r[1]   = ", NumberToString (TNS, (r1 as TNS), 2, 4, 1)
+            ;
+                  res_tmp := (r0 + r1 as TNS)
+            ;
+            print "r[0]+r[1]   = ", NumberToString (TNS, (res_tmp as TNS), 2, 4, 1)
+            ;
+            print "r[0]+r[1]as= ", NumberToString (regdata, (res_tmp as regdata), 2, 4, 1)
+            ;
+              ema_ematop <- (res_tmp as regdata)
+            ]
+        end -- select ematop_ema
+    end -- loop
+end -- procedure ema

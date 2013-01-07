@@ -1,0 +1,99 @@
+-- Import libraries
+import [balsa.types.basic]
+import [balsa.sim.string]
+--import [params]
+constant NUM_BITS = 8
+type regdata is NUM_BITS bits
+constant MSB = NUM_BITS-1
+-- Local type(s)
+type cntrmult is (log NUM_BITS)+1 bits 
+type T2N is (NUM_BITS*2)+1 signed bits
+type TN is (NUM_BITS) bits
+type TN1 is (NUM_BITS+1) bits
+type TNS is (NUM_BITS+1) signed bits
+
+type EMA_MULT_BD is record     
+    multiplier : TN;
+    multiplicand : TNS
+end
+
+procedure mult_shiftadd(
+  -- Input(s)
+  input xy : EMA_MULT_BD;
+  -- Output(s)
+  output product : TNS
+) is
+    --Variable(s)
+    variable a : T2N
+    variable b : T2N
+    variable q : TN
+    variable n : cntrmult
+    
+    shared shiftright is
+    begin
+      print "q before shiftqright : ", NumberToString (TN, q, 2, 4, 1)
+      ;
+        q := (#q[MSB..1] @ #0b0 as TN)
+      ;        
+      print "q after shiftqright : ", NumberToString (TN, q, 2, 4, 1)
+    end -- shared shiftright
+    
+    shared shiftleft is
+    begin
+      print "b before shiftbleft : ", NumberToString (T2N, b, 2, 4, 1)
+      ;
+        b := (((#0b0) @ (#b[2*MSB+1..0])) as T2N)
+      ;        
+      print "b after shiftbleft : ", NumberToString (T2N, b, 2, 4, 1)
+    end -- shared shiftleft
+    
+    shared add is
+    begin
+      print "a = ", NumberToString (T2N, a, 2, 4, 1)
+      ;
+      print "b = ", NumberToString (T2N, b, 2, 4, 1)
+      ;
+        a := (a + b as T2N)
+      ;
+      print "a = a + b = ", NumberToString (T2N, a, 2, 4, 1)
+    end -- shared add
+    
+begin
+    loop
+        select xy then
+            [
+            print "start"
+            ;
+              b := (xy.multiplicand as T2N)--(#xy.multiplicand @ (#xy.multiplicand[MSB] as array NUM_BITS of bit) as T2N)
+            ;
+              q := xy.multiplier
+            ;
+              a := 0
+            ;
+              n := (NUM_BITS as cntrmult)
+            ;
+              loop  
+                  [
+                    if #q[0] then
+                        add()
+                    end 
+                  ;
+                    shiftleft()
+                  ;
+                    shiftright()
+                  ;
+                    n := (n - 1 as cntrmult)
+                  ]
+                   while (n /= 0)       
+              end -- loop
+            ;
+            print "slutt";
+	    print "ikketrunk" , NumberToString (T2N, (a as T2N), 2, 4, 1); 
+            print "trunk" , NumberToString (TNS, (#a[(2*MSB)+1..MSB+1] as TNS), 2, 4, 1) 
+            ;
+              product <- (#a[(2*MSB)+1..MSB+1] as TNS) -- Trunk
+            ]
+        end -- select xy
+    end
+end -- procedure mult_shiftadd
+

@@ -1,0 +1,14 @@
+;;; `NDC35900L.map'
+;;; Balsa cell name mapping file
+;;; Created: Fri May 18 15:12:06 CEST 2012
+;;; By: tg@slmpEee (Linux)
+;;; With net-net version: 4.0
+
+;;; current mapping count
+4
+
+;;; current mappings 
+("BrzFalseVariable_16_3_s31_8_2e_2e15_3b0_2e_2e7_3b0_2e_2e7" . "BrzFalseVariable_16_3_s31_8_2e_2e15_3b0_2e_m4m")
+("BrzBinaryFuncConstR_8_8_1_s8_Subtract_s5_false_s5_false_s5_false_1" . "BrzBinaryFuncConstR_8_8_1_s8_Subtract_s5_f_m3m")
+("BrzBinaryFuncConstR_8_8_1_s3_Add_s5_false_s5_false_s5_false_1" . "BrzBinaryFuncConstR_8_8_1_s3_Add_s5_false__m2m")
+("BrzBinaryFuncConstR_1_8_1_s11_GreaterThan_s5_false_s5_false_s5_false_0" . "BrzBinaryFuncConstR_1_8_1_s11_GreaterThan__m1m")

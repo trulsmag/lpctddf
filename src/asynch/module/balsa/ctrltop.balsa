@@ -1,0 +1,64 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+
+procedure ctrltop (
+  -- Input(s)
+  sync top_ctrltop_start;
+  input top_ctrltop : in_bundle;
+  input thcomptop_ctrltop : bit;
+  array N of input cfg_data_out : regdata;
+  -- Output(s)
+  sync ctrltop_samplertop;
+  output ctrltop_top : regdata;
+  output ctrltop_top_start : bit;
+  array N of sync cfg_r; 
+  array M of output cfg_data_in : regdata
+) is
+begin
+    loop        
+        select top_ctrltop_start then
+            [
+              sync ctrltop_samplertop
+           ||
+              select thcomptop_ctrltop then
+                  [
+                    ctrltop_top_start <-  thcomptop_ctrltop
+                  ]
+              end -- select thcomptop_ctrltop
+            ]
+        end
+    end -- select top_ctrltop_start
+ ||
+    loop
+        select top_ctrltop then
+            case (top_ctrltop.mode as mode) of
+            WRITE then 
+                case (top_ctrltop.addr as addr) of
+                    0 then cfg_data_in[0] <- top_ctrltop.data |
+                    1 then cfg_data_in[1] <- top_ctrltop.data |
+                    2 then cfg_data_in[2] <- top_ctrltop.data 
+                      else cfg_data_in[3] <- top_ctrltop.data 
+                end -- case ( top_ctrltop.addr as 2 bits )
+            |
+                READ then  
+                case (top_ctrltop.addr as addr) of
+                    0 then cfg_data_out[0] -> ctrltop_top || sync cfg_r[0] |
+                    1 then cfg_data_out[1] -> ctrltop_top || sync cfg_r[1] |
+                    2 then cfg_data_out[2] -> ctrltop_top || sync cfg_r[2] |
+                    3 then cfg_data_out[3] -> ctrltop_top || sync cfg_r[3] |
+                    4 then cfg_data_out[4] -> ctrltop_top || sync cfg_r[4] |
+                    5 then cfg_data_out[5] -> ctrltop_top || sync cfg_r[5] |
+                    6 then cfg_data_out[6] -> ctrltop_top || sync cfg_r[6] |
+                    7 then cfg_data_out[7] -> ctrltop_top || sync cfg_r[7] |
+                    8 then cfg_data_out[8] -> ctrltop_top || sync cfg_r[8] 
+                      else cfg_data_out[9] -> ctrltop_top || sync cfg_r[9] 
+                end -- case ( top_ctrltop.addr as addr )
+            end -- case ( top_ctrltop.mode as mode )
+        end -- select top_ctrltop
+    end -- loop
+end -- procedure ctrltop
+
+
+
+

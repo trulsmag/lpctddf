@@ -1,0 +1,72 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+import [med]
+
+procedure medtop (
+  -- Input(s)
+  input samplertop_medtop : regdata; 
+  array 3 of input reg_data_out : regdata;
+  -- Output(s)
+  array 3 of sync reg_r;
+  array 3 of output reg_data_in : regdata;
+  output medtop_ematop : regdata
+) is
+    -- Channel(s)
+    channel medtop_med : array 3 of regdata
+    channel med_medtop : regdata
+    -- Variable(s)
+    variable data : array 3 of regdata
+    variable old : 2 bits
+    variable newold : 2 bits
+begin
+    med(medtop_med, med_medtop)
+ ||
+    loop
+        -- Wait for samplertop_medtop
+        select samplertop_medtop then
+            -- Write samplertop data to reg
+            case old of 
+                0b00 then 
+                    [
+                      reg_data_in[0] <- samplertop_medtop
+                    ;
+                      newold := 0b01
+                    ]
+                |
+                0b01 then 
+                    [
+                      reg_data_in[1] <- samplertop_medtop
+                    ;
+                      newold := 0b10
+                    ]
+                else 
+                    [
+                      reg_data_in[2] <- samplertop_medtop 
+                    ;
+                      newold := 0b00
+                    ]
+            end -- case old
+        end -- select samplertop_medtop
+      ;
+        old := newold
+      ;
+        -- Read medregs
+        reg_data_out[0] -> data[0] || sync reg_r[0]
+      ;
+        reg_data_out[1] -> data[1] || sync reg_r[1]
+      ;
+        reg_data_out[2] -> data[2] || sync reg_r[2]
+      ;
+        [
+          -- Start med and wait for med data
+          medtop_med <- data
+       ||
+          select med_medtop then
+              -- Send data to ematop
+              medtop_ematop <- med_medtop
+          end -- select med_medtop
+        ]
+    end -- loop
+end -- procedure medtop
+

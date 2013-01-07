@@ -1,0 +1,47 @@
+-- Threshold Comparator Testbench
+--import [balsa.types.builtin] -- Functions and type necessary for balsa-c functionality.
+import [balsa.types.basic] -- Type comprehension functions.
+import [balsa.sim.string] -- Other String handling functions.
+import [balsa.sim.fileio] -- File I/O.
+import [balsa.sim.memory] -- Functions and types to implement memory models.
+import [balsa.sim.portio] -- Port file/console I/O used by balsa-make-test.
+import [balsa.sim.sim] -- Simulator specific operations such as time and command line argument access.
+import [ema]
+import [inputGen]
+import [outputComp]
+
+procedure ema_tb (
+  input filename_i0 : String;
+  input filename_i1 : String;
+  input filename_o : String
+) is
+
+channel ch_input_vect : array 3 of regdata
+channel ch_output_vect : regdata
+
+variable file_i0, file_i1 : File
+variable file_o : File
+
+begin
+    filename_i0, filename_i1, filename_o -> then
+        [
+          -- Open file
+          file_i0 := FileOpen (filename_i0, read)
+        ;
+          -- Generate input vector(s)
+          inputGen(3, regdata, array 3 of regdata, "Input vector(s)", <-file_i0, ch_input_vect)
+        ]
+     ||
+        -- DUT
+        ema(ch_input_vect, ch_output_vect)
+     || 
+        [
+          -- Open file(s)
+          file_i1 := FileOpen (filename_i1, read)
+        ;
+          file_o := FileOpen (filename_o, write)
+        ;
+          outputComp(regdata, "Output vector", <- file_i1, <- file_o, ch_output_vect)
+        ]
+    end
+end

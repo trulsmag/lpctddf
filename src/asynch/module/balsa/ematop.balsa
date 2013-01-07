@@ -1,0 +1,53 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+import [ema]
+
+procedure ematop (
+  -- Input(s)
+  input medtop_ematop : regdata; 
+  array 3 of input reg_data_out : regdata;
+  -- Output(s)
+  array 3 of sync reg_r;
+  array 2 of output reg_data_in : regdata;
+  output ematop_thcomptop : regdata
+) is
+    -- Channel(s)
+    channel ematop_ema : array 3 of regdata
+    channel ema_ematop : regdata
+    -- Variable(s)
+    variable data : array 3 of regdata
+begin
+    ema(ematop_ema, ema_ematop)
+ ||
+    loop
+        [
+          -- Wait for medtop_ematop
+          select medtop_ematop then
+              -- Write to reg
+              reg_data_in[0] <- medtop_ematop  -- med_i
+          end -- select medtop_ematop
+        ;
+          -- Read emaregs
+          [reg_data_out[0] -> data[0] || sync reg_r[0]] -- med_i
+        ;
+          [reg_data_out[1] -> data[1] || sync reg_r[1]] -- ema_{i-1}
+        ;
+          [reg_data_out[2] -> data[2] || sync reg_r[2]] -- alpha
+        ;
+          -- Start ema and wait for ema data
+          [        
+            ematop_ema <- data
+         ||
+            select ema_ematop then
+                -- ema_i overwrites ema_{i-1}
+                reg_data_in[1] <- ema_ematop
+              ;            
+                -- Send data to thcomptop          
+                ematop_thcomptop <- ema_ematop -- ema_i
+            end -- select ema_ematop
+          ]
+        ]
+    end -- loop
+end -- procedure ematop
+

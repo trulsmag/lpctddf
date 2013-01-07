@@ -1,0 +1,42 @@
+loading file: `./sampler.breeze'
+determining dependencies
+using technology: `NDC35900L/four_b_rb'
+processing file/block: `[sampler]'
+required Breeze parts (in order, [top-level]):
+[sampler]
+
+making these HCs:
+BinaryFuncConstR: (1 8 1 "GreaterThan" "false" "false" "false" 0) (8 8 1 "Add" "false" "false" "false" 1) (8 8 1 "Subtract" "false" "false" "false" 1)
+Call: (2)
+CallDemuxPush: (1 2)
+CallMux: (8 2) (8 3)
+Case: (1 1 "1")
+Concur: (2)
+ContinuePush: (4)
+DecisionWait: (1)
+Encode: (4 4 "6;15;3;10")
+FalseVariable: (1 1 "") (16 3 "8..15;0..7;0..7")
+Fetch: (1 "false") (8 "false")
+Loop: ()
+Sequence: (2 "S") (10 "SSSSSSSTT")
+UnaryFunc: (1 1 "Invert" "false")
+Variable: (8 1 "") (8 2 "") (8 3 "")
+While: ()
+finished composing HCs
+reading cell name mapping file: `NDC35900L.map'
+
+making HC netlists (24 to build)
+0% |------------------------| 100%
+    ========================
+
+No undeclared component netlists to build
+making Breeze part netlists (1 to build)
+0% |-| 100%
+    =
+
+propagating global signals
+writing EDA native netlist to file: `impl-sampler-sampler.v'
+writing cell list to file: `impl-sampler-sampler.lst'
+finished writing netlist
+writing cell name mapping file: `NDC35900L.map'
+writing file list to file: `impl-sampler-sampler.lst'

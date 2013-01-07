@@ -1,0 +1,32 @@
+-- Import libaries
+import [balsa.types.basic]
+
+procedure inputGen (
+--  parameter N :    cardinal;
+  parameter Tin :  type;
+  parameter Tout : type;
+  parameter portName : String;
+  input file : File;
+  output o : Tout
+) is
+    -- Local type(s)
+--    type Ti is log N bits
+    -- Variable(s)
+    variable line : String
+    variable v : Tout
+--    variable i : Ti
+begin
+    file -> then
+        loop while not FileEOF (file) then
+            line := FileReadLine (file)
+          ;
+            v.value := NumberFromString (16 bits, line, 2)
+          ;
+            line := FileReadLine (file)
+          ;
+            v.threshold := NumberFromString (16 bits, line, 2)
+          ;
+            o <- v
+        end
+    end
+end

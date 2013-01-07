@@ -1,0 +1,91 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+
+procedure med (
+  -- Input (s)  
+  input medtop_med : array 3 of regdata;
+  -- Output (s)
+  output med_medtop : regdata
+) is
+    -- Variable(s)
+    variable res_tmp : bit
+    variable res : array 3 of bit
+    variable c : array 2 of regdata
+    -- Shared procedure(s)
+    shared cmp is
+    begin
+        if c[0] > c[1] then
+            res_tmp := 1
+        else
+            res_tmp := 0
+        end
+    end
+begin
+    loop
+        select medtop_med then  
+            [
+              -- LOAD1
+              c[0] := medtop_med[0]
+            ;
+              c[1] := medtop_med[1]
+            ;
+              -- COMP1
+              cmp()
+            ;
+              res[0] := res_tmp
+            ;
+              -- LOAD2
+              if res[0] then 
+                  c[0] := medtop_med[0] 
+              else
+                  c[0] := medtop_med[1]
+              end -- if res [ 0 ]
+            ;
+              c[1] := medtop_med[2]
+            ;
+              -- COMP2
+              cmp()
+            ;
+              res[1] := res_tmp
+            ;
+              -- LOAD3
+              if res[0] then
+                  [
+                    c[0] := medtop_med[1]
+                  ;
+                    if res[1] then
+                        c[1] := medtop_med[2] 
+                    else
+                        c[1] := medtop_med[0] 
+                    end -- if res [ 1 ]
+                  ]
+              else
+                  [
+                    c[0] := medtop_med[0]
+                  ; 
+                    if res[1] then
+                        c[1] := medtop_med[2] 
+                    else
+                        c[1] := medtop_med[0] 
+                    end -- if res [ 1 ]
+                  ]
+              end -- if res [ 0 ]
+            ;
+              -- COMP3
+              cmp()
+            ;
+              res[2] := res_tmp
+            ;
+              -- FIN 
+              case res of
+                  {0,1,1}, {0,0,1}, {1,0,0} then med_medtop <- medtop_med[0] 
+              |
+                  {1,0,1}, {1,1,1}, {0,0,0} then med_medtop <- medtop_med[1]  
+              |
+                  {0,1,0}, {1,1,0} then med_medtop <- medtop_med[2] 
+              end -- case res
+            ]
+        end -- select medtop_med
+    end -- loop
+end -- procedure med

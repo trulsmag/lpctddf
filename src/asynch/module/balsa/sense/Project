@@ -1,0 +1,19 @@
+;;; Balsa Project file
+;;; Created: Thu May 17 23:17:43 2012
+;;; By: tg@slmpEee (Linux)
+;;; With balsa-mgr version: 4.0 (2010-06-09)
+;;; Supplied with Balsa version: 4.0
+
+(balsa-project
+    (name "test")
+    (import-path ".")
+    (simulation-system "breezesim")
+    (files
+        (top-level "sense"
+            (implementation "impl1"
+                (balsa-netlist-options "--simulation-initialise")
+                (technology "NDC35900L/four_b_rb/")
+            )
+        )
+    )
+)

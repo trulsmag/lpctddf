@@ -1,0 +1,21 @@
+-- Import libaries
+import [balsa.types.basic]
+
+procedure inputGenTop (
+  parameter N : cardinal;
+  parameter T : type;
+  parameter portName : String;
+  input file : File;
+  output o : T
+) is
+    variable line : String
+    variable v : T
+begin
+    file -> then
+        loop while not FileEOF (file) then
+            line := FileReadLine (file);
+            v := NumberFromString (T, line, 2);
+            o <- v
+        end
+    end
+end

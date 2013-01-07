@@ -1,0 +1,100 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+import [regs]
+import [samplertop]
+import [medtop]
+import [ematop]
+import [thcomptop]
+import [ctrltop]
+
+procedure top (
+  -- Input(s)
+  sync top_ctrltop_start;
+  input top_ctrltop : in_bundle;
+  input sense_in : bit;
+  -- Output(s)
+  output sensedrive_out : sensedrive_bd;
+  output ctrltop_top : regdata;
+  output ctrltop_top_start : bit
+) is
+    -- Channel(s)
+    sync ctrltop_samplertop
+    channel samplertop_medtop : regdata
+    channel medtop_ematop : regdata
+    channel ematop_thcomptop : regdata
+    channel thcomptop_ctrltop : bit
+    array N of sync reg_r   
+    array N of sync cfg_r 
+    array N-M of channel reg_data_in : regdata 
+    array M of channel cfg_data_in : regdata    
+    array N of channel reg_data_out : regdata
+    array N of channel cfg_data_out : regdata
+begin
+    regs(
+      -- Input(s)
+      reg_r, 
+      cfg_r,
+      reg_data_in,
+      cfg_data_in,
+      -- Output(s)
+      reg_data_out,
+      cfg_data_out
+    )
+ ||
+    samplertop(
+      -- Input(s)
+      ctrltop_samplertop, 
+      sense_in,
+      -- Output(s)
+      {reg_r[0], reg_r[1]},
+      {reg_data_out[0], reg_data_out[1]},
+      sensedrive_out,
+      samplertop_medtop
+    )
+ ||
+    medtop(
+      -- Input(s)
+      samplertop_medtop,
+      {reg_data_out[4], reg_data_out[5], reg_data_out[6]},
+      -- Output(s)
+      {reg_r[4], reg_r[5], reg_r[6]},
+      {reg_data_in[0], reg_data_in[1], reg_data_in[2]},
+      medtop_ematop
+    )
+ ||
+    ematop(
+      -- Input(s)
+      medtop_ematop,
+      {reg_data_out[7], reg_data_out[8], reg_data_out[2]},
+      -- Output(s)
+      {reg_r[7], reg_r[8], reg_r[2]},
+      {reg_data_in[3], reg_data_in[4]},
+      ematop_thcomptop
+    )
+ ||
+    thcomptop(
+      -- Input(s)
+      ematop_thcomptop,
+      {reg_data_out[9], reg_data_out[3]},
+      -- Output(s)
+      {reg_r[9], reg_r[3]},
+      reg_data_in[5],
+      thcomptop_ctrltop
+    )
+ ||
+    ctrltop(
+      -- Input(s)
+      top_ctrltop_start,
+      top_ctrltop,
+      thcomptop_ctrltop,
+      cfg_data_out,
+      -- Output(s)
+      ctrltop_samplertop,
+      ctrltop_top,
+      ctrltop_top_start,
+      cfg_r,
+      cfg_data_in
+    )
+end -- procedure top
+

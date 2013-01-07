@@ -1,0 +1,58 @@
+-- Import libraries
+import [balsa.types.basic]
+import [balsa.sim.string]
+import [mult_shiftadd]
+
+procedure ema (
+  -- Input (s)  
+  input ematop_ema : array 3 of regdata;
+  -- Output (s)
+  output ema_ematop : regdata
+) is
+    -- Variable(s)
+    variable r0 : TNS
+    variable r1 : TNS
+    variable res_tmp : TNS
+    -- Channel(s)
+    channel ch_xy : EMA_MULT_BD 
+    channel ch_product : TN
+    -- Shared procedure(s)
+    shared add is
+    begin
+        res_tmp := (r0 + r1 as TNS)
+    end -- shared add
+begin
+    mult_shiftadd(
+      ch_xy,
+      ch_product
+    )
+ ||
+    loop
+        select ematop_ema then  
+            [
+              r0 := (ematop_ema[0] as TNS) -- (med_i)
+            ;
+              r1 := (-(ematop_ema[1] as TN1) as TNS) -- (-ema_{i-1})
+            ;
+              add() -- (med_i + (-ema_{i-1})
+            ;
+              [
+                ch_xy <- {
+                  (ematop_ema[2] as TN) , -- (alpha)
+                  (res_tmp as TNS)
+                }
+             ||
+                select ch_product then
+                    r1 := (ch_product as TNS)
+                end -- select ch_product
+              ]
+            ;
+              r0 := (ematop_ema[1] as TNS)
+            ;
+              add() -- (ema_{i-1} + res_tmp)
+            ;
+              ema_ematop <- (res_tmp as regdata)
+            ]
+        end -- select ematop_ema
+    end -- loop
+end -- procedure ema

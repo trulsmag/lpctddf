@@ -1,0 +1,34 @@
+procedure outputComp (
+  parameter T : type;
+  parameter portName : String;
+  input file_i : File;
+  input file_o : File;
+  input i : T
+) is
+    -- Variable(s)
+    variable line_i : String
+    variable line_c : String
+    variable value_i : T
+    variable value_c : T
+begin
+    file_i, file_o -> then
+        loop
+            i  -> then
+                value_i := i;
+                line_i := NumberToString (T, value_i, 2, 0, 1); 
+                line_c := FileReadLine (file_i);
+                value_c := NumberFromString (T, line_c, 2);     
+                if value_i = value_c then
+                    sink FileWrite(file_o, "Compare match : \n")
+                else
+                    sink FileWrite(file_o, "Compare error : \n");
+                    sink FileWrite(file_o, "Got  : ");
+                    sink FileWrite(file_o, line_i);
+                    sink FileWrite(file_o, "\nExp. : ") 
+                end;
+                sink FileWrite (file_o, line_c);
+                sink FileWrite (file_o, "\n")
+            end
+        end
+    end
+end

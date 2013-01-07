@@ -1,0 +1,24 @@
+-- Import library
+import [params]
+
+procedure thcomp (
+  -- Input(s)
+  input thcomptop_thcomp : thcomptop_thcomp_bd;
+  -- Output(s)
+  output thcomp_thcomptop : bit
+) is
+begin
+    loop
+        -- Wait for data
+        select thcomptop_thcomp then
+            -- Compare data with threshold
+            if (thcomptop_thcomp.value > thcomptop_thcomp.threshold) then
+                thcomp_thcomptop <- 1
+            else
+                thcomp_thcomptop <- 0
+            end -- if ( thcomptop_thcomp.value > thcomptop_thcomp.threshold )
+        end -- select thcomptop_thcomp
+    end -- loop
+end -- procedure thcomp
+
+

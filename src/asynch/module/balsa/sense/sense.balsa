@@ -1,0 +1,21 @@
+-- Import libraries
+import [balsa.types.basic]
+
+procedure sense (
+  -- Output(s)
+  output push : bit
+) is
+    -- Variable(s)
+    variable sense_in_d : bit
+    variable sense_in_d_m : bit
+begin
+    loop
+        [
+          sense_in_d_m := 1 -- Constant
+        ;
+          sense_in_d := sense_in_d_m -- Double latched buffer 
+        ;
+          push <- sense_in_d -- Push channel   
+        ]        
+    end -- loop
+end -- procedure sense

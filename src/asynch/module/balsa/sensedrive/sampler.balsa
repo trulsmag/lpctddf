@@ -1,0 +1,76 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+
+procedure sampler (
+  -- Input(s)
+  input samplertop_sampler : samplertop_sampler_bd;
+  input sense_in : bit; 
+  -- Output(s)
+  output sampler_samplertop : regdata
+) is
+    -- Variable(s)
+    variable counter : regdata
+    variable value : regdata
+    variable sensedrive_out : 4 bits
+    -- Shared
+    shared add is
+    begin
+        value := (value + 1 as regdata)
+    end
+    shared dec is 
+    begin
+        counter := (counter - 1 as regdata)
+    end
+begin
+    loop
+        -- Wait for data
+        select samplertop_sampler then
+              -- Load value reg with negative constant value
+              value := samplertop_sampler.subvalue
+            ; 
+              -- Reset counter
+              counter := samplertop_sampler.numsamples
+            ; 
+              sensedrive_out := 0b1010
+            ;
+              sensedrive_out := 0b0011
+            ;
+              -- Count number of times sense_in is low                 
+              loop while counter > 0 then 
+                  select sense_in then -- Synchronize on clock signal                       
+                      [
+                        if (sense_in = 0) then
+                            add()
+                        end
+                      ||
+                        dec()
+                      ]
+                  end -- select sense_in
+              end -- loop
+            ;
+              -- Reset counter
+              counter := (samplertop_sampler.numsamples as regdata)
+            ; 
+              sensedrive_out := 0b1111
+            ;
+               sensedrive_out := 0b0110
+            ;
+              -- Count number of times sense_in is high
+              loop while (counter > 0) then 
+                  select sense_in then 
+                      [
+                        if (sense_in) then
+                            add()
+                        end
+                      ||
+                        dec()
+                      ]
+                  end -- select sense_in
+              end -- loop
+            ;
+              -- Output sample data
+              sampler_samplertop <- value 
+          end -- select samplertop_sampler
+    end -- loop
+end -- procedure sampler

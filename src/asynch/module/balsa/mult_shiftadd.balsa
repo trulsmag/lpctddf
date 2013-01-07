@@ -1,0 +1,71 @@
+-- Import libraries
+import [balsa.types.basic]
+import [balsa.sim.string]
+import [params]
+-- Local type(s)
+type cntrmult is (log NUM_BITS) bits 
+type T2N is (NUM_BITS*2)+1 signed bits
+type TN is (NUM_BITS) bits
+type TN1 is (NUM_BITS+1) bits
+type TNS is (NUM_BITS+1) signed bits
+type EMA_MULT_BD is record     
+    multiplier : TN;
+    multiplicand : TNS
+end
+
+procedure mult_shiftadd(
+  -- Input(s)
+  input xy : EMA_MULT_BD;
+  -- Output(s)
+  output product : TN
+) is
+    --Variable(s)
+    variable a : T2N
+    variable b : T2N
+    variable q : TN
+    variable n : cntrmult
+    -- Shared procedure(s)
+    shared shiftright is
+    begin
+        q := (#q[MSB..1] @ #0b0 as TN)
+    end -- shared shiftright
+    shared shiftleft is
+    begin
+        b := (((#0b0) @ (#b[2*MSB+1..0])) as T2N)
+    end -- shared shiftleft
+    shared add is
+    begin
+        a := (a + b as T2N)
+    end -- shared add
+begin
+    loop
+        select xy then
+            [
+              b := (xy.multiplicand as T2N)
+            ;
+              q := xy.multiplier
+            ;
+              a := 0
+            ;
+              n := (NUM_BITS as cntrmult)
+            ;
+              loop  
+                  [
+                    if #q[0] then
+                        add()
+                    end 
+                  ;
+                    shiftleft()
+                  ;
+                    shiftright()
+                  ;
+                    n := (n - 1 as cntrmult)
+                  ]
+              while (n /= 0)       
+              end -- loop
+            ;
+              product <- (#a[(2*MSB)+1..MSB+1] as TN) -- Trunk
+            ]
+        end -- select xy
+    end -- loop
+end -- procedure mult_shiftadd

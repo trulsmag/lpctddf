@@ -1,0 +1,31 @@
+loading file: `./sense.breeze'
+determining dependencies
+using technology: `NDC35900L/four_b_rb'
+processing file/block: `[sense]'
+required Breeze parts (in order, [top-level]):
+[sense]
+
+making these HCs:
+Constant: (1 1)
+Fetch: (1 "false")
+Loop: ()
+Sequence: (3 "TT")
+Variable: (1 1 "")
+finished composing HCs
+reading cell name mapping file: `NDC35900L.map'
+
+making HC netlists (5 to build)
+0% |-----| 100%
+    =====
+
+No undeclared component netlists to build
+making Breeze part netlists (1 to build)
+0% |-| 100%
+    =
+
+propagating global signals
+writing EDA native netlist to file: `impl-sense-impl1.v'
+writing cell list to file: `impl-sense-impl1.lst'
+finished writing netlist
+writing cell name mapping file: `NDC35900L.map'
+writing file list to file: `impl-sense-impl1.lst'

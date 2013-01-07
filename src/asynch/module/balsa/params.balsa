@@ -1,0 +1,36 @@
+-- params.balsa
+constant N = 10
+constant M = 4
+constant NUM_BITS = 8
+constant EMA_FRACBITS = NUM_BITS
+constant MSB = NUM_BITS-1
+
+type regdata is NUM_BITS bits
+type mode is enumeration READ, WRITE end
+type addr is (log N) bits
+type cntr is (log N) bits
+
+
+type in_bundle is record
+    data : regdata;
+    mode : mode;
+    addr : addr 
+end
+    
+type out_bundle is record
+    data : regdata
+end
+
+type samplertop_sampler_bd is record
+    numsamples, subvalue : regdata
+end
+        
+type sensedrive_bd is record 
+    sense_oe, sense_out, drive_oe, drive_out : bit 
+end 
+
+type thcomptop_thcomp_bd is record
+    value, threshold : regdata
+end 
+
+

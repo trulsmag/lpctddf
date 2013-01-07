@@ -1,0 +1,23 @@
+(--
+    Balsa test harness
+    Created: Wed May  2 15:34:32 CEST 2012
+    By: tg@slmpEee (Linux)
+    With balsa-make-test version: 4.0
+    Command: balsa-make-test -b -I .. -I . -p . thcomp_tb
+--)
+
+import [balsa.sim.portio]
+
+import [thcomp_tb]
+
+procedure balsa
+is
+  channel filename_i0 : String
+  channel filename_i1 : String
+  channel filename_o : String
+begin
+  thcomp_tb (filename_i0, filename_i1, filename_o) ||
+  BalsaInputPortFromValue (String, "filename_i0", <- "_input.dat", filename_i0) ||
+  BalsaInputPortFromValue (String, "filename_i1", <- "_output.dat", filename_i1) ||
+  BalsaInputPortFromValue (String, "filename_o", <- "_monitor.dat", filename_o)
+end

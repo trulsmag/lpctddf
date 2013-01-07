@@ -1,0 +1,112 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+
+procedure sampler (
+  -- Input(s)
+  input samplertop_sampler : samplertop_sampler_bd;
+  input sense_in : bit; 
+  -- Output(s)
+  output sensedrive_out : sensedrive_bd;
+  output sampler_samplertop : regdata
+) is
+    -- Variable(s)
+    variable counter : regdata
+    variable value : regdata
+    -- Shared
+    shared add is
+    begin
+        value := (value + 1 as regdata)
+    end
+    shared dec is
+    begin	   
+        counter := (counter - 0b1 as regdata)
+    end	   
+begin
+    loop
+        -- Wait for data
+        select samplertop_sampler then
+              -- Load value reg with negative constant value
+              value := samplertop_sampler.subvalue
+            ; 
+              -- Reset counter
+              counter := samplertop_sampler.numsamples
+            ; 
+              sensedrive_out <- {
+                -- sense_oe high
+                1,
+                -- sense_out low
+                0,
+                -- drive_oe high
+                1,
+                -- drive_out low
+                0
+              }
+            ;
+               sensedrive_out <- {
+                -- sense_oe high-Z
+                0,
+                -- sense_out low
+                0,
+                -- drive_oe high
+                1,
+                -- drive_out high
+                1
+              }
+            ;
+              -- Count number of times sense_in is low                 
+              loop while counter > 0 then 
+                  select sense_in then -- Synchronize on clock signal
+                      [
+                        if (sense_in = 0) then
+                            add()
+                        end
+                      ;
+                        dec()
+                      ]
+                  end -- select sense_in
+              end -- loop
+            ;
+              -- Reset counter
+              counter := (samplertop_sampler.numsamples as regdata)
+            ; 
+              sensedrive_out <- {
+                -- sense_oe high
+                1,
+                -- sense_out high
+                1,
+                -- drive_oe high
+                1,
+                -- drive_out high
+                1
+              }
+            ;
+               sensedrive_out <- {
+                -- sense_oe high-Z
+                0,
+                -- sense_out low
+                1,
+                -- drive_oe high
+                1,
+                -- drive_out low
+                0
+              }
+            ;
+              -- Count number of times sense_in is high
+              loop while (counter > 0) then 
+                  select sense_in then 
+                      [
+                        if (sense_in) then
+                            add()
+                        end
+                      ;
+                        dec()
+                      ]
+                  end -- select sense_in
+              end -- loop
+            ;
+              -- Output sample data
+              sampler_samplertop <- (value as regdata) 
+          end -- select samplertop_sampler
+    end -- loop
+end -- procedure sampler

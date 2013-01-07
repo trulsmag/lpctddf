@@ -1,0 +1,88 @@
+-- mult_shiftadd_opti.balsa
+import [balsa.types.basic]
+import [balsa.sim.string]
+
+type regdata is 4 bits 
+type aregdata is 5 bits
+type cntr is 3 bits
+constant NUM_BITS = 4
+constant MSB = 3
+constant MSBA = 4
+
+procedure mult_shiftadd_opti(
+  -- Input(s)
+  input xy : array 2 of regdata;
+  -- Output(s)
+  output product : regdata
+) is
+    --Variable(s)
+    variable a : aregdata
+    variable b : regdata
+    variable q : regdata
+    variable n : cntr
+    
+    shared shiftaqright is
+    begin
+      print "aq before shiftaqright : ", NumberToString (aregdata, a, 2, 4, 1), NumberToString (4 bits, q, 2, 4, 1)
+      ;
+        q := (#q[MSB..1] @ (#a[0] as array 1 of bit)as regdata)
+      ;
+        a := (#a[MSBA..1] @ (#0b0) as aregdata)
+      ;
+      print "aq after shiftaqright : ", NumberToString (aregdata, a, 2, 4, 1), NumberToString (4 bits, q, 2, 4, 1)
+    end -- shared shiftaqright
+    
+    shared dec is
+    begin
+        n := (n - 1 as cntr)
+    end -- shared dec
+    
+    shared add is
+    begin
+      print "a = ", NumberToString (aregdata, a, 2, 4, 1)
+      ;
+      print "b = ", NumberToString (regdata, b, 2, 4, 1)
+      ;
+        a := (a + b as aregdata)
+      ;
+      print "a = a + b = ", NumberToString (aregdata, a, 2, 4, 1)
+    end -- shared add
+    
+begin
+    loop
+        [
+          select xy then
+              [
+                b := xy[0]
+              ;
+                q := xy[1] 
+              ;
+                a := 0
+              ;
+                n := (NUM_BITS as cntr)
+              ;
+                loop 
+                    [
+                      if #q[0] then
+                        print "#q[0] = 1"
+                        ;
+                          add()
+                      else
+                          print "#q[0] = 0"
+                      end 
+                    ;
+                      shiftaqright()
+                    ;
+                      dec()
+                    ]
+                    while (n /= 0)
+                end -- loop
+              ;
+              print "aq = ", NumberToString (aregdata, a, 2, 4, 1), NumberToString (4 bits, q, 2, 4, 1)
+              ;
+                product <- (a as regdata)
+              ]
+          end -- select xy
+        ]
+    end
+end -- procedure mult_shiftadd

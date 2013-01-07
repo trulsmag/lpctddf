@@ -1,0 +1,37 @@
+-- Import libraries
+import [balsa.types.basic]
+import [params]
+import [reg1regw2r]
+import [reg1cfgw2r]
+
+procedure regs (
+  -- Input(s)
+  array N of sync reg_r;
+  array N of sync cfg_r;
+  array N-M of input reg_data_in : regdata;
+  array M of input cfg_data_in : regdata;
+  -- Output(s)
+  array N of output reg_data_out : regdata;
+  array N of output cfg_data_out : regdata
+) is
+begin
+    for || i in M .. N-1 then
+        reg1regw2r(
+          reg_r[i],
+          cfg_r[i],
+          reg_data_in[i-M],
+          reg_data_out[i],
+          cfg_data_out[i]
+        )
+    end -- for || i in M .. N 1
+ ||
+    for || i in 0 .. M-1 then
+        reg1cfgw2r(
+          reg_r[i],
+          cfg_r[i],
+          cfg_data_in[i],
+          reg_data_out[i],
+          cfg_data_out[i]
+        )
+    end -- for || i in 0 .. M 1
+end -- procedure regs
